@@ -1,0 +1,7 @@
+2024-12-06 15:59:08,339 - INFO: ====== WebDriver manager ======
+2024-12-06 15:59:08,402 - INFO: Get LATEST chromedriver version for google-chrome
+2024-12-06 15:59:08,857 - INFO: Get LATEST chromedriver version for google-chrome
+2024-12-06 15:59:09,306 - INFO: Driver [/home/w3e57/.wdm/drivers/chromedriver/linux64/131.0.6778.87/chromedriver-linux64/chromedriver] found in cache
+2024-12-06 15:59:10,043 - INFO: Initialized tester for URL: https://www.alojamiento.io/
+2024-12-06 15:59:17,164 - INFO: Successfully navigated to https://www.alojamiento.io/
+2024-12-06 15:59:17,164 - ERROR: Test execution error: 'VacationRentalTester' object has no attribute 'test_h1_tag'
