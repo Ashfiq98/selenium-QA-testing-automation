@@ -1,0 +1,30 @@
+page_url,testcase,passed,comments
+https://www.alojamiento.io/,H1 Tag Existence,True,H1 tag found
+https://www.alojamiento.io/,HTML Tag Sequence,True,"Found tags: ['h1', 'h2', 'h4', 'h5', 'h6']"
+https://www.alojamiento.io/,Image Alt Attributes,True,All images have alt attributes
+https://www.alojamiento.io/,URL Status Check,True,No broken URLs
+https://www.alojamiento.io/,Currency Filtering,False,"Error testing currency filter: Message: no such element: Unable to locate element: {""method"":""css selector"",""selector"":""[id=""currency-selector""]""}
+  (Session info: chrome=131.0.6778.108); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+#0 0x60ddbe92934a <unknown>
+#1 0x60ddbe43f6e0 <unknown>
+#2 0x60ddbe48e3e6 <unknown>
+#3 0x60ddbe48e681 <unknown>
+#4 0x60ddbe4d3b04 <unknown>
+#5 0x60ddbe4b248d <unknown>
+#6 0x60ddbe4d0ed7 <unknown>
+#7 0x60ddbe4b2203 <unknown>
+#8 0x60ddbe480cc0 <unknown>
+#9 0x60ddbe481c9e <unknown>
+#10 0x60ddbe8f6d3b <unknown>
+#11 0x60ddbe8facc2 <unknown>
+#12 0x60ddbe8e3b6c <unknown>
+#13 0x60ddbe8fb837 <unknown>
+#14 0x60ddbe8c910f <unknown>
+#15 0x60ddbe9185a8 <unknown>
+#16 0x60ddbe918770 <unknown>
+#17 0x60ddbe9281c6 <unknown>
+#18 0x7c01e6e9ca94 <unknown>
+#19 0x7c01e6f29c3c <unknown>
+"
+https://www.alojamiento.io/,Script Data Scraping,True,Scraped 1 script entries
