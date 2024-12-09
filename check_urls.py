@@ -21,7 +21,8 @@ class VacationRentalTester:
         try:
             options = Options()
             options.headless = False  # Set to True if you don't want a browser window
-            self.service = Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe")  # Update for your local driver path
+            self.service = Service(ChromeDriverManager().install())
+            # self.service = Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe")  # Update for your local driver path
             self.driver = webdriver.Chrome(service=self.service)
             self.url = url
             self.results = []
@@ -61,6 +62,7 @@ class VacationRentalTester:
                 if href:  # Only check links that have an href attribute
                     print(f"⏳ Checking URL: {href}")
                     logging.info(f"Checking URL: {href}")
+                    # response = requests.get(href)
                     try:
                         response = requests.get(href)
                         if response.status_code == 404:
@@ -73,12 +75,12 @@ class VacationRentalTester:
                             })
                         else:
                             print(f"✅ URL Status Code: {response.status_code}")
-                            self.results.append({
-                                'page_url': href,
-                                'testcase': 'URL Status Code',
-                                'status': 'Pass',
-                                'comments': f'Status Code: {response.status_code}'
-                            })
+                            # self.results.append({
+                            #     'page_url': href,
+                            #     'testcase': 'URL Status Code',
+                            #     'status': 'Pass',
+                            #     'comments': f'Status Code: {response.status_code}'
+                            # })
                     except Exception as e:
                         print(f"❌ Error checking URL: {href}")
                         self.results.append({
