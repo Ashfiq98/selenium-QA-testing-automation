@@ -13,6 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 class VacationRentalTester:
     def __init__(self, url):
         """
@@ -22,7 +23,8 @@ class VacationRentalTester:
             options = Options()
             options.headless = False
             # Setup Chrome WebDriver
-            self.service = Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe")  # For home
+            self.service = Service(ChromeDriverManager().install())
+            # self.service = Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe")  # For home
             self.driver = webdriver.Chrome(service=self.service)
             self.url = url
             self.results = []
@@ -127,106 +129,6 @@ class VacationRentalTester:
                 'comments': f'Error checking image alt attributes: {str(e)}'
             })
 
-    def test_currency_filter(self):
-        """
-        Perform currency filtering and ensure property tiles currency changes according to the selected currency.
-        """
-        try:
-            # Locate the currency dropdown or buttons (adjust selectors as per the actual website)
-            currency_dropdown = self.driver.find_element(By.ID, 'js-currency-sort-footer')  # Example ID
-            currency_options = currency_dropdown.find_elements(By.TAG_NAME, 'li')  # Currency options within <li> tags
-
-            test_results = []
-            for option in currency_options:
-                try:
-                    # Wait for the option to be clickable
-                    WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(option))
-
-                    # Scroll the option into view
-                    self.driver.execute_script("arguments[0].scrollIntoView(true);", option)
-                    time.sleep(0.5)  # Allow time for the element to become fully visible
-
-                    # Click the option
-                    option.click()
-                    time.sleep(2)  # Wait for the page to reload or update
-
-                    # Check property tiles for currency changes
-                    property_prices = self.driver.find_elements(By.CLASS_NAME, 'property-price')  # Example class name
-                    mismatched_prices = [price.text for price in property_prices if option.get_attribute('value') not in price.text]
-
-                    # Collect results
-                    test_results.append({
-                        'currency': option.get_attribute('value'),
-                        'status': 'Pass' if not mismatched_prices else 'Fail',
-                        'mismatched': mismatched_prices
-                    })
-
-                except Exception as e:
-                    test_results.append({
-                        'currency': option.get_attribute('value'),
-                        'status': 'Fail',
-                        'comments': f"Error clicking currency option: {str(e)}"
-                    })
-
-            # Log results for the currency filter test
-            for result in test_results:
-                self.results.append({
-                    'page_url': self.url,
-                    'testcase': f'Currency Filter ({result["currency"]})',
-                    'status': result['status'],
-                    'comments': 'Currency updated correctly' if result['status'] == 'Pass' else f'Mismatch found: {result["mismatched"]}'
-                })
-
-        except Exception as e:
-            self.results.append({
-                'page_url': self.url,
-                'testcase': 'Currency Filtering',
-                'status': 'Fail',
-                'comments': f'Error during currency filtering: {str(e)}'
-            })
-
-    def scrape_script_data(self):
-        """
-        Scrape data from <script> tags and record it to the results.
-        """
-        try:
-            script_tags = self.driver.find_elements(By.TAG_NAME, 'script')
-            scraped_data = []
-
-            for script in script_tags:
-                script_content = script.get_attribute('innerHTML')
-
-                # Look for JSON data in the script
-                try:
-                    json_data = json.loads(script_content)
-                    site_data = {
-                        'SiteURL': json_data.get('siteUrl', ''),
-                        'CampaignID': json_data.get('campaignId', ''),
-                        'SiteName': json_data.get('siteName', ''),
-                        'Browser': self.driver.execute_script("return navigator.userAgent;"),
-                        'CountryCode': json_data.get('countryCode', ''),
-                        'IP': json_data.get('ipAddress', '')
-                    }
-                    scraped_data.append(site_data)
-                except json.JSONDecodeError:
-                    continue  # Skip non-JSON scripts
-
-            # Add scraped data to results
-            for data in scraped_data:
-                self.results.append({
-                    'page_url': self.url,
-                    'testcase': 'Script Data Scraping',
-                    'status': 'Pass',
-                    'comments': f'Scraped data: {data}'
-                })
-
-        except Exception as e:
-            self.results.append({
-                'page_url': self.url,
-                'testcase': 'Script Data Scraping',
-                'status': 'Fail',
-                'comments': f'Error scraping script data: {str(e)}'
-            })
 
     def generate_excel_report(self):
         """
@@ -262,7 +164,7 @@ class VacationRentalTester:
                     cell.alignment = Alignment(horizontal='center', vertical='center')
 
             # Write test results
-            for row, result in enumerate(self.results, len(sheet['A']) + 1):
+            for row, result in enumerate(self.results, start=2):
                 sheet.cell(row=row, column=1, value=result.get('page_url', ''))
                 sheet.cell(row=row, column=2, value=result.get('testcase', ''))
                 sheet.cell(row=row, column=3, value=result.get('status', ''))
@@ -301,8 +203,8 @@ def run_tests(url):
         tester.test_h1_tag()
         tester.test_html_tag_sequence()
         tester.test_image_alt_attributes()
-        tester.test_currency_filter()  # Add currency filter test
-        tester.scrape_script_data()    # Add script data scraping test
+        # tester.test_currency_filter()  # Add currency filter test
+        # tester.scrape_script_data()    # Add script data scraping test
         report_path = tester.generate_excel_report()
 
     except Exception as e:
