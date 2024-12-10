@@ -162,7 +162,6 @@
 import time
 import os
 import re
-# import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -219,31 +218,44 @@ class CurrencySelectionBot:
                                       desc="Processing currencies",
                                       ncols=100, unit="option"):
                 try:
-                    # currency_text = option.find_element(By.XPATH, './/div[contains(@class, "option")]//p').text.strip()
-
-                    # Or try a more flexible approach
-                    # currency_text = option.text.strip()
-
-                    # Debug print to see what's actually in the option
+                    # Extract the currency name
                     currency_raw_text = option.get_attribute('innerText')
+                    # print(currency_raw_text)
                     currency_match = re.search(r'\((.*?)\)', currency_raw_text)
                     currency_text = currency_match.group(1)
-                    # print(currency_text)
                     self.log(f"\n🔄 Processing Currency Option {index}: {currency_text}")
+                    
+                    # Capture initial prices
+                    property_prices = self.driver.find_elements(By.CLASS_NAME, 'js-price-value')
+                    initial_prices = [
+                        re.sub(r'^.{3}', '', price.text.strip()) for price in property_prices
+                    ]
+                    # initial_text = currency_text
                     self.driver.execute_script("arguments[0].click();", option)
-                    time.sleep(3)
+                    time.sleep(3)  # Wait for prices to update
 
-                    property_prices = self.driver.find_elements(
-                        By.CLASS_NAME, 'js-price-value'
-                    )
+                    # Capture updated prices
+                    updated_prices = [
+                        re.sub(r'^.{3}', '', price.text.strip()) for price in property_prices
+                    ]
 
-                    if property_prices:
-                        status = 'Pass'
-                        comments = "Processed Successfully"
+                    # Compare initial and updated prices
+                    price_changes = []
+                    status = 'Pass'
+                    for initial, updated in zip(initial_prices, updated_prices):
+                        if initial != updated:
+                            print(f"Initial : {initial:<10} --- Updated : {updated:<10}")
+                            # price_changes.append(f"{initial} ➡ {updated}")
+                        else:
+                            status = 'Fail'  # Mark as fail if any price does not change
+
+                    if status == 'Pass':
+                        comments = f"Prices updated successfully in {currency_text}"
+                        self.log(f"🟢 Property prices successfully updated in {currency_text} ")
                     else:
-                        status = 'Fail'
-                        comments = "No prices found"
-
+                        comments = "Prices did not update"
+                        self.log(f"❌ Prices did not update for {currency_text}")
+                    
                     self.results.append({
                         'url': self.url,
                         'currency': currency_text,
@@ -255,37 +267,41 @@ class CurrencySelectionBot:
                     self.log(f"❌ Error with currency option {index}: {e}")
                     self.results.append({
                         'url': self.url,
-                        'currency': currency_text,
+                        'currency': "Unknown",
                         'status': 'Fail',
                         'comments': f"Error: {e}"
                     })
-            return True
         except Exception as e:
             self.log(f"❌ Critical Test Error: {e}")
             return False
         finally:
             if self.driver:
                 self.driver.quit()
+        return True
 
     def generate_excel_report(self):
         try:
             os.makedirs('reports', exist_ok=True)
-            report_file = 'reports/Currency_Test_Report.xlsx'
+            report_file = 'reports/all_the_reports.xlsx'
 
             if os.path.exists(report_file):
                 workbook = openpyxl.load_workbook(report_file)
-                sheet = workbook.active
+                if "Currency" not in workbook.sheetnames:
+                    sheet = workbook.create_sheet(title="Currency")
+                else:
+                    sheet = workbook["Currency"]
             else:
                 workbook = openpyxl.Workbook()
                 sheet = workbook.active
-                sheet.title = "Currency Test Results"
-                headers = ['URL', 'Currency', 'Passed/Fail', 'Comments']
-                for col, header in enumerate(headers, 1):
-                    cell = sheet.cell(row=1, column=col)
-                    cell.value = header
-                    cell.font = Font(bold=True)
-                    cell.fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
-                    cell.alignment = Alignment(horizontal='center', vertical='center')
+                sheet.title = "Currency"
+
+            headers = ['Page URL', 'Currency', 'Status', 'Comments']
+            for col, header in enumerate(headers, 1):
+                cell = sheet.cell(row=1, column=col)
+                cell.value = header
+                cell.font = Font(bold=True)
+                cell.fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
+                cell.alignment = Alignment(horizontal='center', vertical='center')
 
             for row, result in enumerate(self.results, start=2):
                 sheet.cell(row=row, column=1, value=result.get('url', ''))
@@ -295,13 +311,7 @@ class CurrencySelectionBot:
 
             for col in range(1, 5):
                 column_letter = get_column_letter(col)
-                max_length = 0
-                for cell in sheet[column_letter]:
-                    try:
-                        if cell.value:
-                            max_length = max(max_length, len(str(cell.value)))
-                    except:
-                        pass
+                max_length = max(len(str(cell.value or '')) for cell in sheet[get_column_letter(col)])
                 sheet.column_dimensions[column_letter].width = max_length + 2
 
             workbook.save(report_file)
@@ -310,6 +320,7 @@ class CurrencySelectionBot:
         except Exception as e:
             self.log(f"❌ Error generating Excel report: {e}")
             return None
+
 
 def main():
     url = "https://www.alojamiento.io/property/cabrils/BC-1178728"
@@ -320,5 +331,5 @@ def main():
     else:
         print("❌ Currency Selection Test Failed")
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

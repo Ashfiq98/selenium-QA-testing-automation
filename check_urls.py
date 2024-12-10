@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm
 
 
-class VacationRentalTester:
+class UrlTester:
     def __init__(self, url):
         """
         Initialize the tester with Chrome WebDriver
@@ -104,12 +104,18 @@ class VacationRentalTester:
         """
         try:
             os.makedirs('reports', exist_ok=True)
-            report_file = 'reports/urls.xlsx'
-
-            workbook = openpyxl.Workbook()
-            sheet = workbook.active
-            sheet.title = "URL Test Results"
-
+            report_file = 'reports/all_the_reports.xlsx'
+            if os.path.exists(report_file):
+                workbook = openpyxl.Workbook()
+                sheet = workbook.active
+                if "URLs test" not in workbook.sheetnames:
+                    sheet = workbook.create_sheet(title="URLs test")
+                else:
+                    sheet = workbook["URLs test"]
+            else:
+                workbook = openpyxl.Workbook()
+                sheet = workbook.active
+                sheet = workbook.create_sheet(title="URLs test")
             # Define headers
             headers = ['Page URL', 'Test Case', 'Status', 'Comments']
             for col, header in enumerate(headers, start=1):
@@ -148,23 +154,23 @@ class VacationRentalTester:
             self.driver.quit()
 
 
-def run_tests(url):
+def run_tests_url(url):
     """
     Run all the tests for the given URL.
     """
     tester = None
     try:
-        tester = VacationRentalTester(url)
+        tester = UrlTester(url)
         tester.navigate()
         tester.check_all_urls()  # Check all URLs and generate the report
     except Exception as e:
         print(f"Test execution error: {e}")
-    finally:
-        if tester:
-            tester.close()
+    # finally:
+    #     if tester:
+    #         tester.close()
 
 
 # Entry point for running tests
-if __name__ == "__main__":
-    test_url = "https://www.alojamiento.io/"
-    run_tests(test_url)
+# if __name__ == "__main__":
+#     test_url = "https://www.alojamiento.io/"
+#     run_tests_url(test_url)
