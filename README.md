@@ -51,7 +51,7 @@ This project automates the testing of a vacation rental details page to validate
    # If it's not working:
    self.service = Service(ChromeDriverManager().install())
    # Then use the local path like this , where your updated driver is located:
-   self.service = Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe")
+   self.service = Service("C:/<Your drivers path>/chromedriver.exe")
    ```
 
 The results will be stored in the `report/all_the_reports.xlsx` file.
