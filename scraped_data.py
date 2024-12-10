@@ -1,3 +1,4 @@
+# scraped_data.py
 import json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,6 +17,9 @@ class ScrapeData:
         """
         options = Options()
         options.headless = False  # Set to True to run in headless mode
+        # self.service = Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe")  # Update for your local driver path
+
+        # self.driver = webdriver.Chrome(service=webdriver.chrome.service.Service("C:/Users/Opu/.wdm/drivers/chromedriver/win64/131.0.6778.87/chromedriver.exe"), options=options)
         self.driver = webdriver.Chrome(service=webdriver.chrome.service.Service(ChromeDriverManager().install()), options=options)
         self.url = url
         self.driver.get(self.url)

@@ -1,3 +1,4 @@
+# main.py
 from currency_check import CurrencySelectionBot  # Adjust the import path accordingly
 from check_urls import run_tests_url
 from upto_alt import run_tests
@@ -29,6 +30,6 @@ def main():
     scraper.scrape_data()
     scraper.close()
 
-    
+
 if __name__ == "__main__":
     main()

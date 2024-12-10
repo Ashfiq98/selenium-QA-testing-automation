@@ -1,3 +1,4 @@
+# check_urls.py
 import os
 import time
 import logging
@@ -92,7 +93,7 @@ class UrlTester:
                     time.sleep(1)  # Optional delay for better visibility
 
             # Generate Excel report after checking all URLs
-            self.generate_excel_report()
+            # self.generate_excel_report()
 
         except Exception as e:
             logging.error(f"Error checking URLs on the page: {e}")
@@ -106,27 +107,30 @@ class UrlTester:
             os.makedirs('reports', exist_ok=True)
             report_file = 'reports/all_the_reports.xlsx'
             if os.path.exists(report_file):
-                workbook = openpyxl.Workbook()
-                sheet = workbook.active
-                if "URLs test" not in workbook.sheetnames:
-                    sheet = workbook.create_sheet(title="URLs test")
+                print("Exist...")
+                # workbook = openpyxl.Workbook()
+                # sheet = workbook.active
+                workbook = openpyxl.load_workbook(report_file)
+                if "Test" not in workbook.sheetnames:
+                    sheet = workbook.create_sheet(title="Test")
                 else:
-                    sheet = workbook["URLs test"]
+                    sheet = workbook["Test"]
             else:
                 workbook = openpyxl.Workbook()
                 sheet = workbook.active
-                sheet = workbook.create_sheet(title="URLs test")
+                sheet.title = "Test"
             # Define headers
-            headers = ['Page URL', 'Test Case', 'Status', 'Comments']
-            for col, header in enumerate(headers, start=1):
-                cell = sheet.cell(row=1, column=col)
-                cell.value = header
-                cell.font = Font(bold=True)
-                cell.fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
-                cell.alignment = Alignment(horizontal='center', vertical='center')
+            if sheet.max_row == 1:
+                headers = ['Page URL', 'Test Case', 'Status', 'Comments']
+                for col, header in enumerate(headers, start=1):
+                    cell = sheet.cell(row=1, column=col)
+                    cell.value = header
+                    cell.font = Font(bold=True)
+                    cell.fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
+                    cell.alignment = Alignment(horizontal='center', vertical='center')
 
             # Write results
-            for row, result in enumerate(self.results, start=2):
+            for row, result in enumerate(self.results, start=5):
                 sheet.cell(row=row, column=1, value=result['page_url'])
                 sheet.cell(row=row, column=2, value=result['testcase'])
                 sheet.cell(row=row, column=3, value=result['status'])
@@ -163,6 +167,7 @@ def run_tests_url(url):
         tester = UrlTester(url)
         tester.navigate()
         tester.check_all_urls()  # Check all URLs and generate the report
+        tester.generate_excel_report()
     except Exception as e:
         print(f"Test execution error: {e}")
     # finally:

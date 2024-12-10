@@ -144,20 +144,17 @@ class VacationRentalTester:
 
             # Check if the file already exists
             if os.path.exists(report_file):
-                # Open existing workbook
-                workbook = openpyxl.load_workbook(report_file)
-                sheet = workbook.active
-                # sheet.title = "upto alt"
-                if "upto alt" not in workbook.sheetnames:
-                    sheet = workbook.create_sheet(title="upto alt")
-                else:
-                    sheet = workbook["upto alt"]
-            else:
-                # Create a new workbook if it doesn't exist
+                # print("Exist...")
                 workbook = openpyxl.Workbook()
                 sheet = workbook.active
-                sheet = workbook.create_sheet()
-                sheet.title = "upto alt"
+                if "Test" not in workbook.sheetnames:
+                    sheet = workbook.create_sheet(title="Test")
+                else:
+                    sheet = workbook["Test"]
+            else:
+                workbook = openpyxl.Workbook()
+                sheet = workbook.active
+                sheet = workbook.create_sheet(title="Test")
 
             # Define headers
             headers = ['Page URL', 'Test Case', 'Status', 'Comments']
@@ -212,7 +209,7 @@ def run_tests(url):
         tester.test_image_alt_attributes()
         # tester.test_currency_filter()  # Add currency filter test
         # tester.scrape_script_data()    # Add script data scraping test
-        report_path = tester.generate_excel_report()
+        tester.generate_excel_report()
 
     except Exception as e:
         print(f"Test execution error: {e}")
