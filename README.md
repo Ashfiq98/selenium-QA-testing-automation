@@ -27,12 +27,15 @@ This project automates the testing of a vacation rental details page to validate
 1. Clone the repository:
    ```
    git clone https://github.com/Ashfiq98/selenium-QA-testing-automation.git
+   ```
+   ```
    cd selenium-QA-testing-automation
    ```
-
 2. Create a virtual environment and activate it:
    ```
    python -m venv my_env
+   ```
+   ```
    source my_env/bin/activate  # On Windows, use `my_env\Scripts\activate`
    ```
 
